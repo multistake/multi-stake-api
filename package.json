@@ -1,20 +1,46 @@
 {
-  "name": "stake-my-sol-api",
-  "version": "1.0.0",
-  "description": "An API, providing endpoints for fetching data of Solana validators and searching in validators",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/stake-my-sol/stake-my-sol-api.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/stake-my-sol/stake-my-sol-api/issues"
-  },
-  "homepage": "https://github.com/stake-my-sol/stake-my-sol-api#readme"
+	"name": "stake-my-sol-api",
+	"version": "1.0.0",
+	"description": "An API, providing endpoints for fetching data of Solana validators and searching in validators",
+	"main": "src/index.js",
+	"scripts": {
+		"start": "npm run build && node ./build/index.js",
+		"start:dev": "nodemon --exec ./node_modules/.bin/babel-node ./src/index.js",
+		"clean": "rm -rf build && mkdir build",
+		"build-babel": "babel -d ./build ./src -s",
+		"build": "npm run clean && npm run build-babel",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/stake-my-sol/stake-my-sol-api.git"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/stake-my-sol/stake-my-sol-api/issues"
+	},
+	"homepage": "https://github.com/stake-my-sol/stake-my-sol-api#readme",
+	"dependencies": {
+		"@solana/web3.js": "^1.35.1",
+		"axios": "^0.26.0",
+		"compression": "^1.7.4",
+		"dotenv": "^16.0.0",
+		"express": "^4.17.2",
+		"lodash": "^4.17.21",
+		"mongodb": "^4.3.1",
+		"mongoose": "^6.2.1"
+	},
+	"devDependencies": {
+		"@babel/cli": "^7.17.6",
+		"@babel/core": "^7.17.5",
+		"@babel/node": "^7.16.8",
+		"@babel/plugin-transform-runtime": "^7.17.0",
+		"@babel/polyfill": "^7.12.1",
+		"@babel/preset-env": "^7.16.11",
+		"@babel/runtime": "^7.17.2",
+		"gulp-nodemon": "^2.5.0",
+		"nodemon": "^2.0.0"
+	}
 }
