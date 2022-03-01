@@ -452,6 +452,67 @@ export default class ValidatorsDAO {
 				pipeline.push(validatorSkipRateStage);
 			}
 
+			// populating validator data with vote performance history
+			// and commission history
+			let populatingStage = [
+				{
+					$lookup: {
+						from: `vote_performances_${network}`,
+						localField: "account",
+						foreignField: "account",
+						as: "vote_performances",
+					},
+				},
+				{
+					$lookup: {
+						from: `commissions_${network}`,
+						localField: "account",
+						foreignField: "account",
+						as: "commissions",
+					},
+				},
+				{
+					$addFields: {
+						vote_performances: {
+							$arrayElemAt: ["$vote_performances", 0],
+						},
+						commissions: {
+							$arrayElemAt: ["$commissions", 0],
+						},
+					},
+				},
+				{
+					$addFields: {
+						vote_performances: "$vote_performances.vote_performances",
+						commissions: "$commissions.commissions",
+					},
+				},
+			];
+
+			pipeline = pipeline.concat(populatingStage);
+
+			// apply validatorVotingPerformance if it's provided
+			if (!_.isEmpty(validatorVotingPerformance)) {
+				let votePerformanceStages = [
+					{
+						$addFields: {
+							vote_performances_avg: {
+								$avg: "$vote_performances.performance",
+							},
+						},
+					},
+					{
+						$match: {
+							vote_performances_avg: {
+								$gte: validatorVotingPerformance[0],
+								$lte: validatorVotingPerformance[1],
+							},
+						},
+					},
+				];
+				pipeline = pipeline.concat(votePerformanceStages);
+			}
+
 			// apply sort by total_score
 			let totalScoreStage = {
 				$sort: { total_score: -1 },
