@@ -1,18 +1,18 @@
 import _ from "lodash";
 
-let commissionHistoryDB;
-let mainnet;
-let testnet;
+let validatorsDB;
+let commissionsMainnet;
+let commissionsTestnet;
 
 export default class CommissionHistoryDAO {
 	static async injectDB(client) {
-		if (commissionHistoryDB && mainnet && testnet) {
+		if (validatorsDB && commissionsMainnet && commissionsTestnet) {
 			return;
 		}
 		try {
-			commissionHistoryDB = await client.db("commission_history");
-			mainnet = await commissionHistoryDB.collection("mainnet");
-			testnet = await commissionHistoryDB.collection("testnet");
+			validatorsDB = await client.db("validators");
+			commissionsMainnet = await validatorsDB.collection("commissions_mainnet");
+			commissionsTestnet = await validatorsDB.collection("commissions_testnet");
 		} catch (e) {
 			console.error(
 				`Unable to establish collection handles in CommissionHistoryDAO: ${e}`
@@ -41,11 +41,11 @@ export default class CommissionHistoryDAO {
 		];
 
 		try {
-			return await commissionHistoryDB
-				.collection(network)
+			return await validatorsDB
+				.collection(`commissions_${network}`)
 				.aggregate(pipeline)
 				.toArray();
-		} catch (error) {
+		} catch (e) {
 			console.error(
 				`Unable to get previousCommissions from DB in CommissionHistoryDAO: ${e}`
 			);
@@ -61,8 +61,8 @@ export default class CommissionHistoryDAO {
 		});
 
 		try {
-			await commissionHistoryDB.collection(network).insertMany(docs);
-		} catch (error) {
+			await validatorsDB.collection(`commissions_${network}`).insertMany(docs);
+		} catch (e) {
 			console.error(
 				`Unable to push newValidatorCommissions to DB in CommissionHistoryDAO: ${e}`
 			);
@@ -72,8 +72,8 @@ export default class CommissionHistoryDAO {
 	static async updateValidatorsCommissionHistory(updateOperations, network) {
 		try {
 			if (!_.isEmpty(updateOperations)) {
-				await commissionHistoryDB
-					.collection(network)
+				await validatorsDB
+					.collection(`commissions_${network}`)
 					.bulkWrite(updateOperations, { ordered: false });
 			}
 		} catch (e) {

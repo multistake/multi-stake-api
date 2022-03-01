@@ -1,18 +1,22 @@
 import _ from "lodash";
 
-let votePerformanceHistoryDB;
-let mainnet;
-let testnet;
+let validatorsDB;
+let votePerformancesMainnet;
+let votePerformancesTestnet;
 
 export default class VotePerformanceHistoryDAO {
 	static async injectDB(client) {
-		if (votePerformanceHistoryDB && mainnet && testnet) {
+		if (validatorsDB && votePerformancesMainnet && votePerformancesTestnet) {
 			return;
 		}
 		try {
-			votePerformanceHistoryDB = await client.db("vote_performance_history");
-			mainnet = await votePerformanceHistoryDB.collection("mainnet");
-			testnet = await votePerformanceHistoryDB.collection("testnet");
+			validatorsDB = await client.db("validators");
+			votePerformancesMainnet = await validatorsDB.collection(
+				"vote_performances_mainnet"
+			);
+			votePerformancesTestnet = await validatorsDB.collection(
+				"vote_performances_testnet"
+			);
 		} catch (e) {
 			console.error(
 				`Unable to establish collection handles in VotePerformanceHistoryDAO: ${e}`
@@ -41,8 +45,8 @@ export default class VotePerformanceHistoryDAO {
 		];
 
 		try {
-			return await votePerformanceHistoryDB
-				.collection(network)
+			return await validatorsDB
+				.collection(`vote_performances_${network}`)
 				.aggregate(pipeline)
 				.toArray();
 		} catch (e) {
@@ -63,19 +67,75 @@ export default class VotePerformanceHistoryDAO {
 		});
 
 		try {
-			await votePerformanceHistoryDB.collection(network).insertMany(docs);
-		} catch (error) {
+			await validatorsDB
+				.collection(`vote_performances_${network}`)
+				.insertMany(docs);
+		} catch (e) {
 			console.error(
 				`Unable to push newValidatorCommissions to DB in VotePerformanceHistoryDAO: ${e}`
 			);
 		}
 	}
 
-	static async updateVotePerformanceHistory(updateOperations, network) {
+	static async updateVotePerformanceHistory(
+		prevStateVotePerformances,
+		newVotePerformances,
+		network
+	) {
 		try {
+			let updateOperations = [];
+
+			newVotePerformances.forEach((newRecord) => {
+				let previousRecord = _.find(prevStateVotePerformances, [
+					"account",
+					newRecord.account,
+				]);
+
+				// if epoch has changed then push new record
+				// commissions array.
+				// or if it wasn't present in previousVotePerformances
+				// add the new document to collection with {upsert: true}
+				if (
+					_.isEmpty(previousRecord) ||
+					previousRecord.epoch !== newRecord.epoch
+				) {
+					updateOperations.push({
+						updateOne: {
+							filter: { account: newRecord.account },
+							update: {
+								$push: {
+									vote_performances: {
+										epoch: newRecord.epoch,
+										performance: newRecord.votePerformance,
+									},
+								},
+							},
+							upsert: true,
+						},
+					});
+				} else if (
+					previousRecord.votePerformance !== newRecord.votePerformance
+				) {
+					updateOperations.push({
+						updateOne: {
+							filter: {
+								account: newRecord.account,
+								[`vote_performances.epoch`]: newRecord.epoch,
+							},
+							update: {
+								$set: {
+									[`vote_performances.$.performance`]:
+										newRecord.votePerformance,
+								},
+							},
+						},
+					});
+				}
+			});
+
 			if (!_.isEmpty(updateOperations)) {
-				await votePerformanceHistoryDB
-					.collection(network)
+				await validatorsDB
+					.collection(`vote_performances_${network}`)
 					.bulkWrite(updateOperations, { ordered: false });
 			}
 		} catch (e) {

@@ -48,7 +48,6 @@ const updateHistoricalValidatorCommission = async (network, epochInfo) => {
 			epochInfo
 		);
 
-		let updateOperations = [];
 		// previous vote performances of [network]
 		let prevStateVotePerformances = previousVotePerformances[network];
 
@@ -73,54 +72,10 @@ const updateHistoricalValidatorCommission = async (network, epochInfo) => {
 			}
 		}
 
-		newVotePerformances.forEach((newRecord) => {
-			let previousRecord = _.find(prevStateVotePerformances, [
-				"account",
-				newRecord.account,
-			]);
-
-			// if epoch has changed then push new record
-			// commissions array.
-			// or if it wasn't present in previousVotePerformances
-			// add the new document to collection with {upsert: true}
-			if (
-				_.isEmpty(previousRecord) ||
-				previousRecord.epoch !== newRecord.epoch
-			) {
-				updateOperations.push({
-					updateOne: {
-						filter: { account: newRecord.account },
-						update: {
-							$push: {
-								vote_performances: {
-									epoch: newRecord.epoch,
-									performance: newRecord.votePerformance,
-								},
-							},
-						},
-						upsert: true,
-					},
-				});
-			} else if (previousRecord.votePerformance !== newRecord.votePerformance) {
-				updateOperations.push({
-					updateOne: {
-						filter: {
-							account: newRecord.account,
-							[`vote_performances.epoch`]: newRecord.epoch,
-						},
-						update: {
-							$set: {
-								[`vote_performances.$.performance`]: newRecord.votePerformance,
-							},
-						},
-					},
-				});
-			}
-		});
-
 		// updating data in DB
 		await VotePerformanceHistoryDAO.updateVotePerformanceHistory(
-			updateOperations,
+			prevStateVotePerformances,
+			newVotePerformances,
 			network
 		);
 

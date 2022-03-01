@@ -1,18 +1,22 @@
 import _ from "lodash";
 
 let validatorsDB;
-let mainnetValidators;
-let testnetValidators;
+let validatorsGeneralMainnet;
+let validatorsGeneralTestnet;
 
 export default class ValidatorsDAO {
 	static async injectDB(client) {
-		if (validatorsDB && mainnetValidators && testnetValidators) {
+		if (validatorsDB && validatorsGeneralMainnet && validatorsGeneralTestnet) {
 			return;
 		}
 		try {
 			validatorsDB = await client.db("validators");
-			mainnetValidators = await validatorsDB.collection("mainnet");
-			testnetValidators = await validatorsDB.collection("testnet");
+			validatorsGeneralMainnet = await validatorsDB.collection(
+				"validators_general_mainnet"
+			);
+			validatorsGeneralTestnet = await validatorsDB.collection(
+				"validators_general_testnet"
+			);
 		} catch (e) {
 			console.error(
 				`Unable to establish collection handles in validatorsDAO: ${e}`
@@ -23,7 +27,7 @@ export default class ValidatorsDAO {
 	static async getValidatorsData(network) {
 		try {
 			return await validatorsDB
-				.collection(network)
+				.collection(`validators_general_${network}`)
 				.find({})
 				.project({ _id: 0 })
 				.toArray();
@@ -82,7 +86,7 @@ export default class ValidatorsDAO {
 
 			if (!_.isEmpty(operations)) {
 				await validatorsDB
-					.collection(network)
+					.collection(`validators_general_${network}`)
 					.bulkWrite(operations, { ordered: false });
 			}
 		} catch (e) {
@@ -92,7 +96,9 @@ export default class ValidatorsDAO {
 
 	static async pushValidatorsData(newValidatorsData, network) {
 		try {
-			await validatorsDB.collection(network).insertMany(newValidatorsData);
+			await validatorsDB
+				.collection(`validators_general_${network}`)
+				.insertMany(newValidatorsData);
 		} catch (e) {
 			console.log(
 				`Unable to push newValidatorsData to Validators DB in validatorsDAO: ${e}`
@@ -166,24 +172,24 @@ export default class ValidatorsDAO {
 			];
 
 			let names = await validatorsDB
-				.collection(network)
+				.collection(`validators_general_${network}`)
 				.aggregate(namePipeline)
 				.map((doc) => doc.name)
 				.toArray();
 
 			let asns = await validatorsDB
-				.collection(network)
+				.collection(`validators_general_${network}`)
 				.aggregate(asnPipeline)
 				.map((doc) => doc.autonomous_system_number)
 				.toArray();
 
 			let softwareVersions = await validatorsDB
-				.collection(network)
+				.collection(`validators_general_${network}`)
 				.aggregate(softwareVersionPipeline)
 				.toArray();
 
 			let dataCenters = await validatorsDB
-				.collection(network)
+				.collection(`validators_general_${network}`)
 				.distinct("data_center_key");
 
 			return {
@@ -329,7 +335,7 @@ export default class ValidatorsDAO {
 			}
 
 			return await validatorsDB
-				.collection(network)
+				.collection(`validators_general_${network}`)
 				.aggregate(pipeline)
 				.toArray();
 		} catch (e) {
