@@ -48,7 +48,9 @@ const getValidatorsData = async (network, epochInfo) => {
 				skipped_slot_percent: Number(doc.skipped_slot_percent),
 			}));
 		} else {
-			console.error("Invalid network in getValidatorsData");
+			console.error(
+				"Invalid network in updateValidatorsData/getValidatorsData"
+			);
 		}
 
 		return newValidatorsData;
@@ -75,7 +77,7 @@ const updateValidatorsData = async () => {
 
 				previousValidatorsData[network] = newValidatorsData;
 			} else {
-				let fetchedValidatorsData = await validatorsDAO.getValidatorsData(
+				let fetchedValidatorsData = await validatorsDAO.getAllValidatorsData(
 					network
 				);
 

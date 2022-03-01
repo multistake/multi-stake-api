@@ -81,7 +81,80 @@ export default class ValidatorsDAO {
 		}
 	}
 
-	static async getValidatorsData(network) {
+	static async getGroupValidatorsData(
+		network,
+		page = 1,
+		perPage = 5,
+		sortBy = "total_score",
+		direction = -1
+	) {
+		try {
+			let skipped = (page - 1) * perPage;
+
+			if (_.isNil(network) || _.isNil(page)) {
+				return [];
+			}
+
+			let pipeline = [
+				{
+					$sort: {
+						[sortBy]: direction,
+					},
+				},
+
+				{
+					$skip: skipped,
+				},
+
+				{
+					$limit: perPage,
+				},
+				{
+					$lookup: {
+						from: "commissions_mainnet",
+						localField: "account",
+						foreignField: "account",
+						as: "commissions",
+					},
+				},
+				{
+					$lookup: {
+						from: "vote_performances_mainnet",
+						localField: "account",
+						foreignField: "account",
+						as: "vote_performances",
+					},
+				},
+				{
+					$addFields: {
+						vote_performances: {
+							$arrayElemAt: ["$vote_performances", 0],
+						},
+						commissions: {
+							$arrayElemAt: ["$commissions", 0],
+						},
+					},
+				},
+				{
+					$addFields: {
+						vote_performances: "$vote_performances.vote_performances",
+						commissions: "$commissions.commissions",
+					},
+				},
+			];
+
+			return await validatorsDB
+				.collection(`validators_general_${network}`)
+				.aggregate(pipeline)
+				.toArray();
+		} catch (e) {
+			console.log(
+				`Unable to get Single validator data from DB in validatorsDAO: ${e}`
+			);
+		}
+	}
+
+	static async getAllValidatorsData(network) {
 		try {
 			return await validatorsDB
 				.collection(`validators_general_${network}`)
