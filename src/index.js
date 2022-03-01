@@ -23,11 +23,11 @@ MongoClient.connect(process.env.MONGO_CONNECT_URI, {
 		await CommissionHistoryDAO.injectDB(client);
 		await VotePerformanceHistoryDao.injectDB(client);
 
-		await updateValidatorsData();
+		// await updateValidatorsData();
 
-		setInterval(async () => {
-			await updateValidatorsData();
-		}, 300000);
+		// setInterval(async () => {
+		// 	await updateValidatorsData();
+		// }, 300000);
 
 		app.listen(PORT, () => {
 			console.log(`listening on port ${PORT}`);

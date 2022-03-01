@@ -19,21 +19,21 @@ export default class DataController {
 		}
 	}
 
-	// static async apiGetSingleValidatorData(req, res) {
-	// 	try {
-	// 		const { network } = req.query;
-	// 		const { account } = req.params;
+	static async apiGetSingleValidatorData(req, res) {
+		try {
+			const { network } = req.query;
+			const { account } = req.params;
 
-	// 		let validatorData = await ValidatorsDAO.getSingleValidatorData(
-	// 			network,
-	// 			account
-	// 		);
+			let validatorData = await ValidatorsDAO.getSingleValidatorData(
+				network,
+				account
+			);
 
-	// 		res.send(validatorData);
-	// 	} catch (err) {
-	// 		console.error(
-	// 			`Unable to get single validator data in DataController: ${err}`
-	// 		);
-	// 	}
-	// }
+			res.send(validatorData);
+		} catch (err) {
+			console.error(
+				`Unable to get single validator data in DataController: ${err}`
+			);
+		}
+	}
 }

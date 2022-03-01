@@ -24,6 +24,63 @@ export default class ValidatorsDAO {
 		}
 	}
 
+	static async getSingleValidatorData(network, account) {
+		try {
+			if (_.isNil(network) || _.isNil(account)) {
+				return [];
+			}
+
+			let pipeline = [
+				{
+					$match: {
+						account: account,
+					},
+				},
+				{
+					$lookup: {
+						from: "commissions_mainnet",
+						localField: "account",
+						foreignField: "account",
+						as: "commissions",
+					},
+				},
+				{
+					$lookup: {
+						from: "vote_performances_mainnet",
+						localField: "account",
+						foreignField: "account",
+						as: "vote_performances",
+					},
+				},
+				{
+					$addFields: {
+						vote_performances: {
+							$arrayElemAt: ["$vote_performances", 0],
+						},
+						commissions: {
+							$arrayElemAt: ["$commissions", 0],
+						},
+					},
+				},
+				{
+					$addFields: {
+						vote_performances: "$vote_performances.vote_performances",
+						commissions: "$commissions.commissions",
+					},
+				},
+			];
+
+			return await validatorsDB
+				.collection(`validators_general_${network}`)
+				.aggregate(pipeline)
+				.toArray();
+		} catch (e) {
+			console.log(
+				`Unable to get Single validator data from DB in validatorsDAO: ${e}`
+			);
+		}
+	}
+
 	static async getValidatorsData(network) {
 		try {
 			return await validatorsDB
