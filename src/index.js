@@ -27,7 +27,7 @@ MongoClient.connect(process.env.MONGO_CONNECT_URI, {
 
 		setInterval(async () => {
 			await updateValidatorsData();
-		}, 600000);
+		}, process.env.UPDATE_INTERVAL);
 
 		app.listen(PORT, () => {
 			console.log(`listening on port ${PORT}`);
