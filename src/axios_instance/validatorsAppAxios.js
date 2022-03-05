@@ -4,7 +4,7 @@ dotenv.config();
 
 const instance = axios.create({
 	baseURL: "https://www.validators.app/api/v1",
-	timeout: 120000,
+	timeout: 30000,
 	headers: {
 		Token: process.env.VALIDATORS_APP_TOKEN || "tWvMW29ppkSkyyxkme3r5c2c",
 	},

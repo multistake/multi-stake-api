@@ -8,7 +8,8 @@ import updateValidatorsData from "./tasks/updateValidatorsData";
 
 dotenv.config();
 
-const PORT = process.env.PORT || 8000;
+const PORT = parseInt(process.env.PORT) || 8000;
+const UPDATE_INTERVAL = parseInt(process.env.UPDATE_INTERVAL);
 
 MongoClient.connect(process.env.MONGO_CONNECT_URI, {
 	useNewUrlParser: true,
@@ -27,7 +28,7 @@ MongoClient.connect(process.env.MONGO_CONNECT_URI, {
 
 		setInterval(async () => {
 			await updateValidatorsData();
-		}, process.env.UPDATE_INTERVAL);
+		}, UPDATE_INTERVAL);
 
 		app.listen(PORT, () => {
 			console.log(`listening on port ${PORT}`);
