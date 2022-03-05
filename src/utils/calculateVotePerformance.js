@@ -7,7 +7,7 @@ const calculateSingleVotePerformance = (rawCreditData, epochInfo) => {
 
 	if (!_.isEmpty(recentCredits)) {
 		[epoch, finalCredits, startingCredits] = recentCredits;
-		votePerformance = (finalCredits - startingCredits) / epochInfo.slotsInEpoch;
+		votePerformance = (finalCredits - startingCredits) / epochInfo.slotIndex;
 	}
 
 	// calculate vote Performance with this formula
