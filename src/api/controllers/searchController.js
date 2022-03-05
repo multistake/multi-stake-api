@@ -21,7 +21,7 @@ export default class SearchController {
 					validatorVotingPerformance,
 				},
 				network,
-			} = req.body;
+			} = req.body.data;
 
 			// structure of query parameters
 			// {

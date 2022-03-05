@@ -3,7 +3,7 @@ import ValidatorsDAO from "../../dao/validatorsDAO";
 export default class DataController {
 	static async apiGetSearchFormData(req, res) {
 		try {
-			const { network } = req.body;
+			const { network } = req.body.data;
 
 			let { names, asns, softwareVersions, dataCenters } =
 				await ValidatorsDAO.getSearchFormData(network);
@@ -21,7 +21,7 @@ export default class DataController {
 
 	static async apiGetSingleValidatorData(req, res) {
 		try {
-			const { account, network } = req.body;
+			const { account, network } = req.body.data;
 
 			let validatorData = await ValidatorsDAO.getSingleValidatorData(
 				network,
@@ -43,7 +43,7 @@ export default class DataController {
 				page,
 				perPage,
 				sort: { sortBy, direction },
-			} = req.body;
+			} = req.body.data;
 
 			let validatorsData = await ValidatorsDAO.getGroupValidatorsData(
 				network,
