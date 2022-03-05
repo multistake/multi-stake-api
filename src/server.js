@@ -1,7 +1,7 @@
 import express from "express";
 import compression from "compression";
 import { searchRoutes, dataRoutes } from "./api/routes/index";
-import { cors } from "cors";
+import cors from "cors";
 
 const app = express();
 
