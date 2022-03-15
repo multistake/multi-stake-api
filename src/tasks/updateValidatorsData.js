@@ -22,9 +22,15 @@ const getValidatorsData = async (network, epochInfo) => {
 		let newValidatorsData;
 
 		if (network === "mainnet") {
-			const stakePoolsValidators = await getStakePoolValidators();
+			let stakePoolsValidators = await getStakePoolValidators();
+
 			// only available on mainnet
 			const validatorsApy = await getValidatorsApy("mainnet", epochInfo.epoch);
+
+			let skipStakePoolValidatorsUpdate = false;
+			if (_.isEmpty(stakePoolsValidators)) {
+				skipStakePoolValidatorsUpdate = true;
+			}
 
 			newValidatorsData = validatorsData.map((doc) => {
 				// specify apy for current doc
@@ -36,9 +42,9 @@ const getValidatorsData = async (network, epochInfo) => {
 				return {
 					...doc,
 					apy: apy,
-					received_stake_from_stake_pools: stakePoolsValidators.has(
-						doc.account
-					),
+					received_stake_from_stake_pools: skipStakePoolValidatorsUpdate
+						? doc.received_stake_from_stake_pools
+						: stakePoolsValidators.has(doc.account),
 					skipped_slot_percent: Number(doc.skipped_slot_percent),
 				};
 			});

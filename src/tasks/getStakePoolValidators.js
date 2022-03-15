@@ -1,11 +1,12 @@
 import { stakeSolanaAxios } from "../axios_instance/index";
 
+// eslint-disable-next-line no-unused-vars
 const getStakePools = async () => {
 	try {
 		let {
 			data: { data: stakePools },
 		} = await stakeSolanaAxios.get(
-			"/pools?sort=apy&desc=true&offset=0&limit=2000"
+			"/pools?sort=apy&desc=true&offset=0&limit=10"
 		);
 
 		return stakePools;
@@ -16,14 +17,20 @@ const getStakePools = async () => {
 
 const getStakePoolValidators = async () => {
 	try {
-		let stakePools = await getStakePools();
+		// got replaced by alternative solution below
+		// due to instabilities in related endpoint
+		// for getting stake pools' names
+
+		// let stakePools = await getStakePools();
+
+		let stakePools = process.env.STAKE_POOLS.split(",");
 		let ValidatorsSet = new Set();
 
 		for (let pool of stakePools) {
 			let {
 				data: { data: poolValidators },
 			} = await stakeSolanaAxios.get(
-				`/pool-validators/${pool.name}?sort=apy&desc=true&offset=0&limit=2000`
+				`/pool-validators/${pool}?sort=apy&desc=true&offset=0&limit=2000`
 			);
 
 			ValidatorsSet = poolValidators.reduce(
