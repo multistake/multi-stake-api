@@ -111,7 +111,7 @@ export default class ValidatorsDAO {
 				},
 				{
 					$lookup: {
-						from: "commissions_mainnet",
+						from: `commissions_${network}`,
 						localField: "account",
 						foreignField: "account",
 						as: "commissions",
@@ -119,7 +119,7 @@ export default class ValidatorsDAO {
 				},
 				{
 					$lookup: {
-						from: "vote_performances_mainnet",
+						from: `vote_performances_${network}`,
 						localField: "account",
 						foreignField: "account",
 						as: "vote_performances",
