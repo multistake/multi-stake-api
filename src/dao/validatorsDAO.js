@@ -301,6 +301,12 @@ export default class ValidatorsDAO {
 				},
 			];
 
+			let count = await validatorsDB
+				.collection(`validators_general_${network}`)
+				.count();
+
+			console.log("count: ", count);
+
 			let names = await validatorsDB
 				.collection(`validators_general_${network}`)
 				.aggregate(namePipeline)
@@ -323,6 +329,7 @@ export default class ValidatorsDAO {
 				.distinct("data_center_key");
 
 			return {
+				count,
 				names,
 				asns,
 				softwareVersions,

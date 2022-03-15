@@ -5,10 +5,11 @@ export default class DataController {
 		try {
 			const { network } = req.body.data;
 
-			let { names, asns, softwareVersions, dataCenters } =
+			let { count, names, asns, softwareVersions, dataCenters } =
 				await ValidatorsDAO.getSearchFormData(network);
 
 			res.send({
+				count,
 				names,
 				asns,
 				softwareVersions,
