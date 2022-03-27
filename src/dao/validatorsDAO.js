@@ -236,7 +236,7 @@ export default class ValidatorsDAO {
 		}
 	}
 
-	static async getSearchFormData(network) {
+	static async getGetGeneralData(network) {
 		try {
 			let namePipeline = [
 				{
@@ -304,8 +304,6 @@ export default class ValidatorsDAO {
 			let count = await validatorsDB
 				.collection(`validators_general_${network}`)
 				.count();
-
-			console.log("count: ", count);
 
 			let names = await validatorsDB
 				.collection(`validators_general_${network}`)

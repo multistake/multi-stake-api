@@ -1,12 +1,12 @@
 import ValidatorsDAO from "../../dao/validatorsDAO";
 
 export default class DataController {
-	static async apiGetSearchFormData(req, res) {
+	static async apiGetGeneralData(req, res) {
 		try {
 			const { network } = req.body.data;
 
 			let { count, names, asns, softwareVersions, dataCenters } =
-				await ValidatorsDAO.getSearchFormData(network);
+				await ValidatorsDAO.getGetGeneralData(network);
 
 			res.send({
 				count,
