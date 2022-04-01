@@ -191,8 +191,15 @@ export default class ValidatorsDAO {
 							$set: {},
 						};
 						_.keys(newValidatorData).forEach((key) => {
+							// *: we handle special attributes with dedicated logic here
 							if (!_.isEqual(newValidatorData[key], prevValidatorData[key])) {
-								updateDoc.$set[key] = newValidatorData[key];
+								if (key === "received_stake_from_stake_pools") {
+									if (newValidatorData[key] !== null) {
+										updateDoc.$set[key] = newValidatorData[key];
+									}
+								} else {
+									updateDoc.$set[key] = newValidatorData[key];
+								}
 							}
 						});
 

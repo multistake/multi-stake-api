@@ -27,11 +27,6 @@ const getValidatorsData = async (network, epochInfo) => {
 			// only available on mainnet
 			const validatorsApy = await getValidatorsApy("mainnet", epochInfo.epoch);
 
-			let skipStakePoolValidatorsUpdate = false;
-			if (_.isEmpty(stakePoolsValidators)) {
-				skipStakePoolValidatorsUpdate = true;
-			}
-
 			newValidatorsData = validatorsData.map((doc) => {
 				// specify apy for current doc
 				let { apy } = _.find(
@@ -39,12 +34,20 @@ const getValidatorsData = async (network, epochInfo) => {
 					(apy) => apy.node_pk === doc.account
 				) || { apy: null };
 
+				if (_.isEmpty(stakePoolsValidators)) {
+					return {
+						...doc,
+						apy: apy,
+						skipped_slot_percent: Number(doc.skipped_slot_percent),
+					};
+				}
+
 				return {
 					...doc,
 					apy: apy,
-					received_stake_from_stake_pools: skipStakePoolValidatorsUpdate
-						? doc.received_stake_from_stake_pools
-						: stakePoolsValidators.has(doc.account),
+					received_stake_from_stake_pools: stakePoolsValidators.has(
+						doc.account
+					),
 					skipped_slot_percent: Number(doc.skipped_slot_percent),
 				};
 			});
@@ -92,7 +95,6 @@ const updateValidatorsData = async () => {
 					await validatorsDAO.pushValidatorsData(newValidatorsData, network);
 
 					previousValidatorsData[network] = newValidatorsData;
-					// we are done with task
 					continue;
 				} else {
 					await validatorsDAO.updateValidatorsData(

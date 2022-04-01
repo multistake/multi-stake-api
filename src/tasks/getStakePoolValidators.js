@@ -26,6 +26,10 @@ const getStakePoolValidators = async () => {
 		let stakePools = process.env.STAKE_POOLS.split(",");
 		let ValidatorsSet = new Set();
 
+		// TODO: find the list of stake pool public keys
+		// TODO: and retrieve validators they've delegated to
+		// TODO: using web3 package instead of API below
+		// !: This API is slow and unstable and often fails
 		for (let pool of stakePools) {
 			let {
 				data: { data: poolValidators },
