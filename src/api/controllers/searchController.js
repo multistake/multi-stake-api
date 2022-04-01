@@ -11,14 +11,14 @@ export default class SearchController {
 					names,
 					dataCenters,
 					dataCenterConcentrationScore,
-					validatorAsn,
-					softwareVersion,
-					validatorActiveStake,
+					asns,
+					softwareVersions,
+					activeStake,
 					receivedStakeFromStakePools,
 					currentValidatorCommission,
-					validatorApy,
-					validatorSkipRate,
-					validatorVotingPerformance,
+					apy,
+					skipRate,
+					votingPerformance,
 				},
 				network,
 			} = req.body.data;
@@ -47,14 +47,14 @@ export default class SearchController {
 				names,
 				dataCenters,
 				dataCenterConcentrationScore,
-				validatorAsn,
-				softwareVersion,
-				validatorActiveStake,
+				asns,
+				softwareVersions,
+				activeStake,
 				receivedStakeFromStakePools,
 				currentValidatorCommission,
-				validatorApy,
-				validatorSkipRate,
-				validatorVotingPerformance
+				apy,
+				skipRate,
+				votingPerformance
 			);
 
 			res.send(foundValidators);

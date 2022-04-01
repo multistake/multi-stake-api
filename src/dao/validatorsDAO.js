@@ -361,14 +361,14 @@ export default class ValidatorsDAO {
 		names,
 		dataCenters,
 		dataCenterConcentrationScore,
-		validatorAsn,
-		softwareVersion,
-		validatorActiveStake,
+		asns,
+		softwareVersions,
+		activeStake,
 		receivedStakeFromStakePools,
 		currentValidatorCommission,
-		validatorApy,
-		validatorSkipRate,
-		validatorVotingPerformance
+		apy,
+		skipRate,
+		votingPerformance
 	) {
 		try {
 			let pipeline = [];
@@ -400,32 +400,32 @@ export default class ValidatorsDAO {
 			}
 
 			// apply asn if it's provided
-			if (!_.isEmpty(validatorAsn)) {
+			if (!_.isEmpty(asns)) {
 				let asnStage = {
-					$match: { autonomous_system_number: { $in: validatorAsn } },
+					$match: { autonomous_system_number: { $in: asns } },
 				};
 				pipeline.push(asnStage);
 			}
 
 			// apply softwareVersion if it's provided
-			if (!_.isEmpty(softwareVersion)) {
+			if (!_.isEmpty(softwareVersions)) {
 				let softwareVersionStage = {
-					$match: { software_version: { $in: softwareVersion } },
+					$match: { software_version: { $in: softwareVersions } },
 				};
 				pipeline.push(softwareVersionStage);
 			}
 
 			// apply validatorActiveStake if it's provided
-			if (!_.isEmpty(validatorActiveStake)) {
-				let validatorActiveStakeStage = {
+			if (!_.isEmpty(activeStake)) {
+				let activeStakeStage = {
 					$match: {
 						active_stake: {
-							$gte: validatorActiveStake[0],
-							$lte: validatorActiveStake[1],
+							$gte: activeStake[0],
+							$lte: activeStake[1],
 						},
 					},
 				};
-				pipeline.push(validatorActiveStakeStage);
+				pipeline.push(activeStakeStage);
 			}
 
 			// apply receivedStakeFromStakePools if it's provided
@@ -452,24 +452,24 @@ export default class ValidatorsDAO {
 			}
 
 			// apply apy if it's provided
-			if (!_.isEmpty(validatorApy)) {
+			if (!_.isEmpty(apy)) {
 				let apyStage = {
-					$match: { apy: { $gte: validatorApy[0], $lte: validatorApy[1] } },
+					$match: { apy: { $gte: apy[0], $lte: apy[1] } },
 				};
 				pipeline.push(apyStage);
 			}
 
 			// apply skipRate if it's provided
-			if (!_.isEmpty(validatorSkipRate)) {
-				let validatorSkipRateStage = {
+			if (!_.isEmpty(skipRate)) {
+				let skipRateStage = {
 					$match: {
 						skipped_slot_percent: {
-							$gte: validatorSkipRate[0],
-							$lte: validatorSkipRate[1],
+							$gte: skipRate[0],
+							$lte: skipRate[1],
 						},
 					},
 				};
-				pipeline.push(validatorSkipRateStage);
+				pipeline.push(skipRateStage);
 			}
 
 			// populating validator data with vote performance history
@@ -512,7 +512,7 @@ export default class ValidatorsDAO {
 			pipeline = pipeline.concat(populatingStage);
 
 			// apply validatorVotingPerformance if it's provided
-			if (!_.isEmpty(validatorVotingPerformance)) {
+			if (!_.isEmpty(votingPerformance)) {
 				let votePerformanceStages = [
 					{
 						$addFields: {
@@ -524,8 +524,8 @@ export default class ValidatorsDAO {
 					{
 						$match: {
 							vote_performances_avg: {
-								$gte: validatorVotingPerformance[0],
-								$lte: validatorVotingPerformance[1],
+								$gte: votingPerformance[0],
+								$lte: votingPerformance[1],
 							},
 						},
 					},
