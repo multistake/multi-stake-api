@@ -238,47 +238,49 @@ export default class ValidatorsDAO {
 
 	static async getGetGeneralData(network) {
 		try {
-			let namePipeline = [
-				{
-					$match: {
-						name: {
-							$nin: [null, undefined, ""],
-						},
-					},
-				},
-				{
-					$project: {
-						_id: 0,
-						name: 1,
-					},
-				},
-				{
-					$sort: {
-						name: 1,
-					},
-				},
-			];
+			// *: pipelines below got replaced by distinct() method
+			// *: reason is duplicate results.
+			// let namePipeline = [
+			// 	{
+			// 		$match: {
+			// 			name: {
+			// 				$nin: [null, undefined, ""],
+			// 			},
+			// 		},
+			// 	},
+			// 	{
+			// 		$project: {
+			// 			_id: 0,
+			// 			name: 1,
+			// 		},
+			// 	},
+			// 	{
+			// 		$sort: {
+			// 			name: 1,
+			// 		},
+			// 	},
+			// ];
 
-			let asnPipeline = [
-				{
-					$match: {
-						autonomous_system_number: {
-							$nin: [null, undefined],
-						},
-					},
-				},
-				{
-					$project: {
-						_id: 0,
-						autonomous_system_number: 1,
-					},
-				},
-				{
-					$sort: {
-						autonomous_system_number: 1,
-					},
-				},
-			];
+			// let asnPipeline = [
+			// 	{
+			// 		$match: {
+			// 			autonomous_system_number: {
+			// 				$nin: [null, undefined],
+			// 			},
+			// 		},
+			// 	},
+			// 	{
+			// 		$project: {
+			// 			_id: 0,
+			// 			autonomous_system_number: 1,
+			// 		},
+			// 	},
+			// 	{
+			// 		$sort: {
+			// 			autonomous_system_number: 1,
+			// 		},
+			// 	},
+			// ];
 
 			let softwareVersionPipeline = [
 				{
@@ -307,15 +309,20 @@ export default class ValidatorsDAO {
 
 			let names = await validatorsDB
 				.collection(`validators_general_${network}`)
-				.aggregate(namePipeline)
-				.map((doc) => doc.name)
-				.toArray();
+				.distinct("name");
+
+			names = names.filter(
+				(name) =>
+					name !== "" && name !== '""' && name !== undefined && name !== null
+			);
 
 			let asns = await validatorsDB
 				.collection(`validators_general_${network}`)
-				.aggregate(asnPipeline)
-				.map((doc) => doc.autonomous_system_number)
-				.toArray();
+				.distinct("autonomous_system_number");
+
+			asns = asns.filter(
+				(asn) => asn !== "" && asn !== '""' && asn !== undefined && asn !== null
+			);
 
 			let softwareVersions = await validatorsDB
 				.collection(`validators_general_${network}`)
@@ -325,6 +332,14 @@ export default class ValidatorsDAO {
 			let dataCenters = await validatorsDB
 				.collection(`validators_general_${network}`)
 				.distinct("data_center_key");
+
+			dataCenters = dataCenters.filter(
+				(datacenterkey) =>
+					datacenterkey !== "" &&
+					datacenterkey !== '""' &&
+					datacenterkey !== undefined &&
+					datacenterkey !== null
+			);
 
 			return {
 				count,
