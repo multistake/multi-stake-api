@@ -12,25 +12,25 @@ const PORT = parseInt(process.env.PORT) || 8000;
 const UPDATE_INTERVAL = parseInt(process.env.UPDATE_INTERVAL);
 
 MongoClient.connect(process.env.MONGO_CONNECT_URI, {
-	useNewUrlParser: true,
-	useUnifiedTopology: true,
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
 })
-	.catch((err) => {
-		console.log(err);
-		process.exit(1);
-	})
-	.then(async (client) => {
-		await ValidatorsDAO.injectDB(client);
-		await CommissionHistoryDAO.injectDB(client);
-		await VotePerformanceHistoryDao.injectDB(client);
+  .catch((err) => {
+    console.log(err);
+    process.exit(1);
+  })
+  .then(async (client) => {
+    await ValidatorsDAO.injectDB(client);
+    await CommissionHistoryDAO.injectDB(client);
+    await VotePerformanceHistoryDao.injectDB(client);
 
-		await updateValidatorsData();
+    await updateValidatorsData();
 
-		setInterval(async () => {
-			await updateValidatorsData();
-		}, UPDATE_INTERVAL);
+    setInterval(async () => {
+      await updateValidatorsData();
+    }, UPDATE_INTERVAL);
 
-		app.listen(PORT, () => {
-			console.log(`listening on port ${PORT}`);
-		});
-	});
+    app.listen(PORT, () => {
+      console.log(`listening on port ${PORT}`);
+    });
+  });
