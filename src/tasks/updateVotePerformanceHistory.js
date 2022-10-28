@@ -5,7 +5,6 @@ import { Connection, clusterApiUrl } from "@solana/web3.js";
 
 let previousVotePerformances = {
 	mainnet: null,
-	testnet: null,
 };
 
 const getVoteAccountsInfo = async (network) => {
@@ -13,9 +12,6 @@ const getVoteAccountsInfo = async (network) => {
 
 	try {
 		switch (network) {
-			case "testnet":
-				cluster = "testnet";
-				break;
 			case "mainnet":
 				cluster = "mainnet-beta";
 				break;

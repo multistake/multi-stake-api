@@ -2,20 +2,16 @@ import _ from "lodash";
 
 let validatorsDB;
 let validatorsGeneralMainnet;
-let validatorsGeneralTestnet;
 
 export default class ValidatorsDAO {
   static async injectDB(client) {
-    if (validatorsDB && validatorsGeneralMainnet && validatorsGeneralTestnet) {
+    if (validatorsDB && validatorsGeneralMainnet) {
       return;
     }
     try {
       validatorsDB = await client.db("validators");
       validatorsGeneralMainnet = await validatorsDB.collection(
         "validators_general_mainnet"
-      );
-      validatorsGeneralTestnet = await validatorsDB.collection(
-        "validators_general_testnet"
       );
     } catch (e) {
       console.error(
