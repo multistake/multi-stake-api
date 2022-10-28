@@ -133,8 +133,12 @@ export default class ValidatorsDAO {
         },
         {
           $addFields: {
-            vote_performances: "$vote_performances.vote_performances",
-            commissions: "$commissions.commissions",
+            vote_performances: {
+              $slice: ["$vote_performances.vote_performances", -15],
+            },
+            commissions: {
+              $slice: ["$commissions.commissions", -15],
+            },
           },
         },
       ];
