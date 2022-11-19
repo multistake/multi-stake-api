@@ -1,16 +1,7 @@
-import { Connection, clusterApiUrl } from "@solana/web3.js";
+import getSolanaConnection from "./getSolanaConnection";
 
 const getCurrentEpochInfo = async (network) => {
-  let cluster;
-  switch (network) {
-    case "mainnet":
-      cluster = "mainnet-beta";
-      break;
-    default:
-      console.error("Unknown network");
-  }
-
-  let connection = new Connection(clusterApiUrl(cluster), "confirmed");
+  let connection = getSolanaConnection(network);
 
   return await connection.getEpochInfo();
 };
