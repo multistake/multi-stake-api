@@ -22,7 +22,7 @@
 	},
 	"homepage": "https://github.com/stake-my-sol/stake-my-sol-api#readme",
 	"dependencies": {
-		"@solana/web3.js": "^1.35.1",
+		"@solana/web3.js": "^1.91.3",
 		"axios": "^0.26.0",
 		"compression": "^1.7.4",
 		"cors": "^2.8.5",
